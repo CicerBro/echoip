@@ -1,5 +1,5 @@
 # Build
-FROM golang:1.15-buster AS build
+FROM golang:1.19-buster AS build
 WORKDIR /go/src/github.com/mpolden/echoip
 COPY . .
 
