@@ -439,7 +439,7 @@ func (s *Server) Handler() http.Handler {
 	// Health
 	r.Route("GET", "/health", s.HealthHandler)
 
-	// Health
+	// Root
 	r.Route("HEAD", "/", s.HeadHandler)
 
 	// JSON

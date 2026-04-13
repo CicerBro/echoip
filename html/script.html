@@ -1,88 +1,90 @@
-<script lang="text/javascript">
-  let host = "{{ .Host }}";
-  let jsonObj = "{{ .JSON }}";
-  let data = JSON.parse(jsonObj);
-  let tool = "curl";
-  let commandBox, widgetBox, compositePath, commandStr;
-  let path
-  let ipQuery, portQuery
-  let ipCheckBox, portCheckBox, portInput
-  let ip = ''
+<script>
+  const host = "{{ .Host }}";
+  const json = "{{ .JSON }}";
+  const data = JSON.parse(json);
+  const commandEl = document.getElementById("command");
+  const outputEl = document.getElementById("output");
+  const portInput = document.getElementById("portInput");
+  let path = "";
+  let ipQuery = "";
+  let portQuery = "";
 
-  window.onload = (event) => {
-     commandBox = document.getElementById('command');
-     widgetBox = document.getElementById('output');
-     ipCheckBox = document.getElementById('ipCheckBox')
-     portCheckBox = document.getElementById('portCheckBox')
-     portInput = document.getElementById('portInput')
-     reset()
-     setcommdStr()
-     changeInput("ip")
-  }
-
-  function reset() {
-    path = '';
-    ipQuery = '';
-    portQuery = '';
-  }
-
-  function setcommdStr() {
-    compositePath = `${path}${portQuery}${ipQuery}`;
-    commandStr = `${tool} ${host}/${compositePath}`;
-    commandBox.innerText = commandStr;
+  function render() {
+    commandEl.textContent = `curl ${host}/${path}${portQuery}${ipQuery}`;
   }
 
   function changeInput(input, button) {
-    path = input
-    portQuery = ""
+    path = input === "ip" ? "" : input;
+    portQuery = "";
     portInput.classList.add("hidden");
-    switch(path) {
+
+    switch (input) {
       case "json":
-        output.innerText = jsonObj
-        break
+        outputEl.textContent = json;
+        break;
       case "country-iso":
-        output.innerText = data["country_iso"]
-        break
+        outputEl.textContent = data.country_iso;
+        break;
       case "port":
-        portInput.classList.remove("hidden");
         path = "port";
-        output.innerText = "{}";
-        let currentPort = document.querySelector("#portInput").value;
-        updatePort(currentPort);
-        break
+        portQuery = `/${portInput.value}`;
+        portInput.classList.remove("hidden");
+        outputEl.textContent = "{}";
+        break;
       case "ip":
-        output.innerText = data["ip"]
-        path = ""
-        break
+        outputEl.textContent = data.ip;
+        break;
       default:
-        output.innerText = data[path]
+        outputEl.textContent = data[input];
     }
-    setcommdStr();
 
-    // set button selected
     if (button) {
-      allButtons = document.querySelectorAll(('button.selected'));
-      allButtons.forEach((btn) => {btn.classList.remove("selected")})
-
+      document.querySelectorAll("button.selected").forEach((selectedButton) => {
+        selectedButton.classList.remove("selected");
+      });
       button.classList.add("selected");
     }
+
+    render();
   }
 
-  function navigate(event) {
-    console.log("navigate", compositePath)
-    window.location = compositePath
+  function navigate() {
+    window.location = `${path}${portQuery}${ipQuery}`;
   }
 
   function updatePort(value) {
-    port = value
-    portQuery = `/${port}`
-    setcommdStr()
+    portQuery = `/${value}`;
+    render();
   }
 
   function updateIP(value) {
-    ip = value
-    ipQuery = `?ip=${ip}`;
-    setcommdStr()
-    changeInput("ip", null)
+    ipQuery = `?ip=${value}`;
+    changeInput("ip");
   }
+
+  changeInput("ip");
+
+  /* Theme toggle */
+  (function () {
+    var root = document.documentElement;
+    var current = root.getAttribute("data-theme") || "auto";
+    var buttons = document.querySelectorAll("[data-theme-value]");
+
+    function apply(theme) {
+      current = theme;
+      root.setAttribute("data-theme", theme);
+      localStorage.setItem("theme", theme);
+      buttons.forEach(function (btn) {
+        btn.classList.toggle("active", btn.getAttribute("data-theme-value") === theme);
+      });
+    }
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        apply(btn.getAttribute("data-theme-value"));
+      });
+    });
+
+    apply(current);
+  })();
 </script>
