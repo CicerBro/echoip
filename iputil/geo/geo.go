@@ -3,6 +3,7 @@ package geo
 import (
 	"math"
 	"net"
+	"time"
 
 	geoip2 "github.com/oschwald/geoip2-golang"
 )
@@ -11,6 +12,7 @@ type Reader interface {
 	Country(net.IP) (Country, error)
 	City(net.IP) (City, error)
 	ASN(net.IP) (ASN, error)
+	BuildDate() string
 	IsEmpty() bool
 }
 
@@ -40,6 +42,7 @@ type geoip struct {
 	country *geoip2.Reader
 	city    *geoip2.Reader
 	asn     *geoip2.Reader
+	build   string
 }
 
 func Open(countryDB, cityDB string, asnDB string) (Reader, error) {
@@ -65,7 +68,23 @@ func Open(countryDB, cityDB string, asnDB string) (Reader, error) {
 		}
 		asn = r
 	}
-	return &geoip{country: country, city: city, asn: asn}, nil
+	return &geoip{country: country, city: city, asn: asn, build: latestBuildDate(country, city, asn)}, nil
+}
+
+func latestBuildDate(readers ...*geoip2.Reader) string {
+	var latest uint
+	for _, reader := range readers {
+		if reader == nil {
+			continue
+		}
+		if buildEpoch := reader.Metadata().BuildEpoch; buildEpoch > latest {
+			latest = buildEpoch
+		}
+	}
+	if latest == 0 {
+		return ""
+	}
+	return time.Unix(int64(latest), 0).UTC().Format("2006-01-02")
 }
 
 func (g *geoip) Country(ip net.IP) (Country, error) {
@@ -149,6 +168,10 @@ func (g *geoip) ASN(ip net.IP) (ASN, error) {
 		asn.AutonomousSystemOrganization = record.AutonomousSystemOrganization
 	}
 	return asn, nil
+}
+
+func (g *geoip) BuildDate() string {
+	return g.build
 }
 
 func (g *geoip) IsEmpty() bool {

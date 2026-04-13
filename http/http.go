@@ -34,7 +34,6 @@ type Server struct {
 	cache      *Cache
 	gr         geo.Reader
 	profile    bool
-	Sponsor    bool
 }
 
 type Response struct {
@@ -356,24 +355,24 @@ func (s *Server) DefaultHandler(w http.ResponseWriter, r *http.Request) *appErro
 	var data = struct {
 		Response
 		Host           string
+		GeoIPBuildDate string
 		BoxLatTop      float64
 		BoxLatBottom   float64
 		BoxLonLeft     float64
 		BoxLonRight    float64
 		JSON           string
 		Port           bool
-		Sponsor        bool
 		ExplicitLookup bool
 	}{
 		response,
 		r.Host,
+		s.gr.BuildDate(),
 		response.Latitude + 0.05,
 		response.Latitude - 0.05,
 		response.Longitude - 0.05,
 		response.Longitude + 0.05,
 		string(json),
 		s.LookupPort != nil,
-		s.Sponsor,
 		r.URL.Query().Has("ip"),
 	}
 	if err := t.Execute(w, &data); err != nil {

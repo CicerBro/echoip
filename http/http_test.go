@@ -37,6 +37,8 @@ func (t *testDb) ASN(net.IP) (geo.ASN, error) {
 	return geo.ASN{AutonomousSystemNumber: 59795, AutonomousSystemOrganization: "Hosting4Real"}, nil
 }
 
+func (t *testDb) BuildDate() string { return "2026-04-13" }
+
 func (t *testDb) IsEmpty() bool { return false }
 
 func testServer() *Server {
@@ -183,6 +185,24 @@ func TestJSONHandlers(t *testing.T) {
 		if out != tt.out {
 			t.Errorf("Expected %q for %s, got %q", tt.out, tt.url, out)
 		}
+	}
+}
+
+func TestDefaultHandlerShowsGeoIPBuildDate(t *testing.T) {
+	log.SetOutput(ioutil.Discard)
+	server := testServer()
+	server.Template = "../html"
+	s := httptest.NewServer(server.Handler())
+
+	out, status, err := httpGet(s.URL, "", "Mozilla/5.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if status != 200 {
+		t.Fatalf("Expected %d, got %d", 200, status)
+	}
+	if !strings.Contains(out, "last updated 2026-04-13") {
+		t.Fatalf("Expected HTML to contain MaxMind build date, got %q", out)
 	}
 }
 

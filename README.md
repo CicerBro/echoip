@@ -1,7 +1,5 @@
 # echoip
 
-[![ci](https://github.com/mpolden/echoip/actions/workflows/ci.yml/badge.svg)](https://github.com/mpolden/echoip/actions/workflows/ci.yml)
-
 A simple service for looking up your IP address. This is the code that powers
 https://ifconfig.co.
 
@@ -9,7 +7,7 @@ https://ifconfig.co.
 
 Just the business, please:
 
-```
+```bash
 $ curl ifconfig.co
 127.0.0.1
 
@@ -28,7 +26,7 @@ $ bat -print=b ifconfig.co/ip
 
 Country and city lookup:
 
-```
+```bash
 $ curl ifconfig.co/country
 Elbonia
 
@@ -47,7 +45,7 @@ Dilbert Technologies
 
 As JSON:
 
-```
+```bash
 $ curl -H 'Accept: application/json' ifconfig.co  # or curl ifconfig.co/json
 {
   "city": "Bornyasherk",
@@ -62,7 +60,7 @@ $ curl -H 'Accept: application/json' ifconfig.co  # or curl ifconfig.co/json
 
 Port testing:
 
-```
+```bash
 $ curl ifconfig.co/port/80
 {
   "ip": "127.0.0.1",
@@ -76,22 +74,22 @@ between IPv4 and IPv6 lookup.
 
 ## Features
 
-* Easy to remember domain name
-* Fast
-* Supports IPv6
-* Supports HTTPS
-* Supports common command-line clients (e.g. `curl`, `httpie`, `ht`, `wget` and `fetch`)
-* JSON output
-* ASN, country and city lookup, using data from MaxMind
-* Port testing
-* All endpoints (except `/port`) can return information about a custom IP address specified via `?ip=` query parameter
-* Open source under the [BSD 3-Clause license](https://opensource.org/licenses/BSD-3-Clause)
+- Easy to remember domain name
+- Fast
+- Supports IPv6
+- Supports HTTPS
+- Supports common command-line clients (e.g. `curl`, `httpie`, `ht`, `wget` and `fetch`)
+- JSON output
+- ASN, country and city lookup, using data from MaxMind
+- Port testing
+- All endpoints (except `/port`) can return information about a custom IP address specified via `?ip=` query parameter
+- Open source under the [BSD 3-Clause license](https://opensource.org/licenses/BSD-3-Clause)
 
 ## Why?
 
-* To scratch an itch
-* An excuse to use Go for something
-* Faster than ifconfig.me and has IPv6 support
+- To scratch an itch
+- An excuse to use Go for something
+- Faster than ifconfig.me and has IPv6 support
 
 ## Building
 
@@ -105,10 +103,22 @@ documentation](https://golang.org/doc/code.html).
 
 ## Docker image
 
-A Docker image is available on [Docker
-Hub](https://hub.docker.com/r/mpolden/echoip), which can be downloaded with:
+A Docker image is available on [Github Packages](https://github.com/CicerBro/echoip/pkgs/container/echoip), which can be downloaded with:
 
-`docker pull mpolden/echoip`
+`docker pull ghcr.io/cicerbro/echoip:latest`
+
+```yaml
+services:
+  echoip:
+    container_name: echoip
+    image: ghcr.io/cicerbro/echoip:latest
+    command: -r -p -C 128 -H=X-Forwarded-For -c /opt/echoip/data/GeoLite2-City.mmdb -a /opt/echoip/data/GeoLite2-ASN.mmdb -f /opt/echoip/data/GeoLite2-Country.mmdb
+    volumes:
+      - /var/lib/GeoIP:/opt/echoip/data
+    environment:
+      TZ: "Europe/London"
+    restart: always
+```
 
 ## Geolocation data
 
@@ -122,6 +132,7 @@ The databases can be downloaded with:
 Downloading requires a MaxMind account and license key. See the following links for more information:
 
 - https://dev.maxmind.com/geoip/geolite2-free-geolocation-data
+- https://dev.maxmind.com/geoip/updating-databases/#using-geoip-update
 - https://dev.maxmind.com/geoip/updating-databases/#directly-downloading-databases
 
 ### Usage
@@ -144,7 +155,6 @@ Usage of echoip:
         Listening address (default ":8080")
   -p    Enable port lookup
   -r    Perform reverse hostname lookups
-  -s    Show sponsor logo
   -t string
         Path to template dir (default "html")
 ```
