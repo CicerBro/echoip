@@ -178,7 +178,7 @@
               </div>
               <div id="output" class="widgetbox output"></div>
 
-              <form class="stack-form ip-query-form">
+              <form class="stack-form ip-query-form" onsubmit="event.preventDefault(); navigate();">
                 <fieldset>
                   <div class="ip-query-combo">
                     <label class="visually-hidden" for="ipInput">Check another IP (optional)</label>
@@ -191,7 +191,7 @@
                       spellcheck="false"
                       onkeyup="updateIP(this.value)"
                     />
-                    <button type="button" class="btn ip-query-submit" onclick="navigate()">Check</button>
+                    <button type="submit" class="btn ip-query-submit">Check</button>
                   </div>
                 </fieldset>
               </form>
